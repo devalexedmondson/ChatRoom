@@ -11,5 +11,10 @@ namespace ServerSide
         public string name;
         public string connection;
         public string status; 
+        
+        public User()
+        {
+
+        }
     }
 }

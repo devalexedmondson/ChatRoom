@@ -4,9 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server
+namespace ServerSide
 {
-    class Room
+    public class Room
     {
+        Dictionary<User, int> users;
+        public string name;
+        public string password;
+        public Room()
+        {
+            users = new Dictionary<User, int>();
+        }
     }
 }
