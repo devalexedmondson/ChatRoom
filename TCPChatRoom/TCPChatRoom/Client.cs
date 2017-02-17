@@ -9,43 +9,55 @@ using System.Threading.Tasks;
 
 namespace TCPChatRoom
 {
-    class Client
+    public class Client 
     {
         public Client()
         {
           
         }
-        public void CreateClient()
+        public void CreateClient(string message)
         {
             try
             {
                 TcpClient client = new TcpClient("127.0.0.1", 8080);
-                StreamReader reader = new StreamReader(client.GetStream());
-                StreamWriter writer = new StreamWriter(client.GetStream());
-                string emptyString = string.Empty;
-                while (!emptyString.Equals("Exit")) ;
+                byte[] data = Encoding.ASCII.GetBytes(message);
+                NetworkStream stream = client.GetStream();
+                string responseData = string.Empty;
+                while (!responseData.Equals("Exit"))
                 {
-                    Console.WriteLine("Type a message to send to the chat!");
-                    emptyString = Console.ReadLine();
-                    writer.WriteLine(emptyString);
-                    writer.Flush();
-                    string server_string = reader.ReadLine();
-                    Console.WriteLine(server_string);
+                    stream.Write(data, 0, data.Length);
+                    Console.WriteLine("You: {0}", message);
+                    data = new byte[256];
+                    int bytes = stream.Read(data, 0, data.Length);
+                    Console.WriteLine("Received: {0}", responseData);
+                    
                 }
-                reader.Close();
-                writer.Close();
+                stream.Close();
                 client.Close();
             }
-            catch (Exception)
+            catch (SocketException e)
             {
-                Console.WriteLine("Error connecting to server");
+                Console.WriteLine("SocketException: {0}" , e);
             }
-            //TCPClient client = new TCP client (IP,Port)
-            //new string reader 
-            //new string writer
-            //create variable to hold what user inputs
-            //tell user to type something in
-            //take what user inputs and store it in variable
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+            }
         }
     }
+    //StreamReader reader = new StreamReader(client.GetStream());
+    //StreamWriter writer = new StreamWriter(client.GetStream());
+    //string emptyString = string.Empty;
+    //while (!emptyString.Equals("Exit")) ;
+    //{
+    //    Console.WriteLine("Type a message to send to the chat!");
+    //    emptyString = Console.ReadLine();
+    //    writer.WriteLine(emptyString);
+    //    writer.Flush();
+    //    string server_string = reader.ReadLine();
+    //    Console.WriteLine(server_string);
+    //}
+    //reader.Close();
+    //writer.Close();
+    //client.Close();
 }
