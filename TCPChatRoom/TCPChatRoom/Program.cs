@@ -12,7 +12,7 @@ namespace ClientSide
         static void Main(string[] args)
         {
             Client client = new Client();
-            client.CreateClient(Console.ReadLine());
+            client.CreateClient("asdf");
             
         }
     }

@@ -11,6 +11,9 @@ namespace TCPChatRoom
 {
     public class Client 
     {
+        private TcpClient client;
+        private NetworkStream stream;
+        private byte[] data;
         public Client()
         {
           
@@ -19,21 +22,7 @@ namespace TCPChatRoom
         {
             try
             {
-                TcpClient client = new TcpClient("127.0.0.1", 8080);
-                byte[] data = Encoding.ASCII.GetBytes(message);
-                NetworkStream stream = client.GetStream();
-                string responseData = string.Empty;
-                while (!responseData.Equals("Exit"))
-                {
-                    stream.Write(data, 0, data.Length);
-                    Console.WriteLine("You: {0}", message);
-                    data = new byte[256];
-                    int bytes = stream.Read(data, 0, data.Length);
-                    Console.WriteLine("Received: {0}", responseData);
-                    
-                }
-                stream.Close();
-                client.Close();
+                 client = new TcpClient("192.168.0.130", 8080);
             }
             catch (SocketException e)
             {
@@ -43,21 +32,30 @@ namespace TCPChatRoom
             {
                 Console.WriteLine("ArgumentNullException: {0}", e);
             }
+            SendCommunication();
         }
+        public void SendCommunication()
+        {
+            while (true)
+            {
+                byte[] data = Encoding.ASCII.GetBytes(Console.ReadLine());
+                 stream =  client.GetStream();
+
+                stream.Write(data, 0, data.Length);
+                RecieveCommunication();
+            }
+        }
+        public void RecieveCommunication()
+        {
+            data = new byte[256];
+
+            string responseData = string.Empty;
+            
+            int bytes = stream.Read(data, 0, data.Length);
+            responseData = Encoding.ASCII.GetString(data, 0, bytes);
+            Console.WriteLine("Received: {0}", responseData);
+        }
+        //stream.Close();
+        //client.Close();
     }
-    //StreamReader reader = new StreamReader(client.GetStream());
-    //StreamWriter writer = new StreamWriter(client.GetStream());
-    //string emptyString = string.Empty;
-    //while (!emptyString.Equals("Exit")) ;
-    //{
-    //    Console.WriteLine("Type a message to send to the chat!");
-    //    emptyString = Console.ReadLine();
-    //    writer.WriteLine(emptyString);
-    //    writer.Flush();
-    //    string server_string = reader.ReadLine();
-    //    Console.WriteLine(server_string);
-    //}
-    //reader.Close();
-    //writer.Close();
-    //client.Close();
 }

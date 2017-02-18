@@ -23,7 +23,7 @@ namespace ServerSide
             TcpListener listener = null;
             try
             {
-                listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8080);
+                listener = new TcpListener(IPAddress.Parse("192.168.0.130"), 8080);
 
                 byte[] bytes = new byte[256];
                 string data = null;
@@ -38,18 +38,22 @@ namespace ServerSide
                     NetworkStream stream = client.GetStream();
                     int i;
 
-                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    i = stream.Read(bytes, 0, bytes.Length);
+
+                    while (i != 0)
                     {
                         data = Encoding.ASCII.GetString(bytes, 0, i);
-                        Console.WriteLine("Received: {0}", data);
-                        data = data;
+                        Console.WriteLine("From User: {0}", data);
+                      // if i want to alter data--> data = data;
                         byte[] msg = Encoding.ASCII.GetBytes(data);
 
 
                         stream.Write(msg, 0, msg.Length);
                         Console.WriteLine("Sent: {0}", data);
+
+                        i = stream.Read(bytes, 0, bytes.Length);
                     }
-                    client.Close();
+                    //client.Close();
                     Console.WriteLine("Closing connection with client");
                 }
             }
