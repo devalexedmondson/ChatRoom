@@ -6,6 +6,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using System.Threading;
 
 namespace ServerSide
@@ -14,6 +15,7 @@ namespace ServerSide
     {
         List<Room> room;
         TcpListener listener;
+        TcpClient client;
         private string data;
         private byte[] bytes;
         Queue myQ;
@@ -29,9 +31,6 @@ namespace ServerSide
             try
             {
                 listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8080);
-
-                 bytes = new byte[256];
-                 data = null;
                 listener.Start();
                 Console.WriteLine("MultiThread Started");
 
@@ -40,40 +39,47 @@ namespace ServerSide
             {
                 Console.WriteLine("SocketException: {0}", e);
             }
-            Thread newThread = new Thread(RecieveClients);
+            Thread newThread = new Thread(RecieveClientsAsync);
             newThread.Start();
             //RecieveClients();
         }
-       public void RecieveClients()
+       public async void RecieveClientsAsync()
        {
+            bytes = new byte[256];
+            data = null;
             while (true)
                 {//thread for each client
                     Console.WriteLine("Waiting for client connections.");
-                    TcpClient client = listener.AcceptTcpClient();
+                    client = listener.AcceptTcpClient();
                     Console.WriteLine("Accepted new client connection.");
-                    NetworkStream stream = client.GetStream();
-                    int i;
-
-                    i = stream.Read(bytes, 0, bytes.Length);
-
-                    while (i != 0)
-                    {
-                        data = Encoding.ASCII.GetString(bytes, 0, i);
-                        myQ.Enqueue(data);
-                        Console.WriteLine("From User: {0}", data);
-                      // if i want to alter data--> data = data.toUpper().trim();
-                        byte[] msg = Encoding.ASCII.GetBytes(data);
-                    
-                        stream.Write(msg, 0, msg.Length);
-                        Console.WriteLine("Sent: {0}", data);
-
-                        myQ.Dequeue();
-                        i = stream.Read(bytes, 0, bytes.Length);
-                    }
-                    client.Close();
-                    Console.WriteLine("Closing connection with client");
+                Thread newThread = new Thread(ProcessClientRequest);
+                newThread.Start();
                 }
             }
+        public void ProcessClientRequest()
+        {
+            NetworkStream stream = client.GetStream();
+            int i;
+
+            i = stream.Read(bytes, 0, bytes.Length);
+
+            while (i != 0)
+            {
+                data = Encoding.ASCII.GetString(bytes, 0, i);
+                myQ.Enqueue(data);
+                Console.WriteLine("From User: {0}", data);
+                //if i want to alter data--> data = data.toUpper();
+                byte[] msg = Encoding.ASCII.GetBytes(data);
+
+                stream.Write(msg, 0, msg.Length);
+                Console.WriteLine("Sent: {0}", data);
+
+                myQ.Dequeue();
+                i = stream.Read(bytes, 0, bytes.Length);
+            }
+            client.Close();
+            Console.WriteLine("Closing connection with client");
+        }
 
         public void NotifyClientMessage()
         {
