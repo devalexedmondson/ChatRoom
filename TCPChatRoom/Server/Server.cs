@@ -43,7 +43,7 @@ namespace ServerSide
             newThread.Start();
             //RecieveClients();
         }
-       public async void RecieveClientsAsync()
+       public  void RecieveClientsAsync()
        {
             bytes = new byte[256];
             data = null;

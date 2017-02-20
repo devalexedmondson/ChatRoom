@@ -18,11 +18,11 @@ namespace TCPChatRoom
         {
           
         }
-        public void CreateClient(string message)
+        public void CreateClient(string message, string ipAddress, int portNumber)
         {
             try
             {
-                 client = new TcpClient("127.0.0.1", 8080);
+                 client = new TcpClient(ipAddress, portNumber);
             }
             catch (SocketException e)
             {

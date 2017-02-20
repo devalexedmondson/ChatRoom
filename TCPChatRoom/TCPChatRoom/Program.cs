@@ -12,7 +12,11 @@ namespace ClientSide
         static void Main(string[] args)
         {
             Client client = new Client();
-            client.CreateClient("asdf");
+            Console.WriteLine("Please provide the IP that you wish to connect to.");
+            string ipAddress = Console.ReadLine();
+            Console.WriteLine("Please provide the port");
+            int port = int.Parse(Console.ReadLine());
+            client.CreateClient("",ipAddress,port);
             
         }
     }
