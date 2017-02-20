@@ -13,29 +13,36 @@ namespace ServerSide
     {
         List<Room> room;
         TcpListener listener;
+        private string data;
+        private byte[] bytes;
         
         public Server()
         {
             room = new List<Room>();
         }
-
         public void StartServer()
         {
-             listener = null;
+            listener = null;
             try
             {
                 listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8080);
 
-                byte[] bytes = new byte[256];
-                string data = null;
+                 bytes = new byte[256];
+                 data = null;
                 listener.Start();
                 Console.WriteLine("MultiThread Started");
 
-          //}
-       //public void RecieveClients()
-           //{
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+            RecieveClients();
+        }
+       public void RecieveClients()
+       {
 
-                while (true)
+            while (true)
                 {//thread for each client
                     Console.WriteLine("Waiting for client connections.");
                     TcpClient client = listener.AcceptTcpClient();
@@ -62,19 +69,6 @@ namespace ServerSide
                     Console.WriteLine("Closing connection with client");
                 }
             }
-            catch (SocketException e)
-            {
-                Console.WriteLine("SocketException: {0}", e);
-            }
-        }
-
-
-
-
-
-
-
-
 
         public void NotifyClientMessage()
         {
