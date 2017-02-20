@@ -12,6 +12,7 @@ namespace ServerSide
     public class Server
     {
         List<Room> room;
+        TcpListener listener;
         
         public Server()
         {
@@ -20,18 +21,22 @@ namespace ServerSide
 
         public void StartServer()
         {
-            TcpListener listener = null;
+             listener = null;
             try
             {
-                listener = new TcpListener(IPAddress.Parse("192.168.0.130"), 8080);
+                listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8080);
 
                 byte[] bytes = new byte[256];
                 string data = null;
                 listener.Start();
                 Console.WriteLine("MultiThread Started");
 
+          //}
+       //public void RecieveClients()
+           //{
+
                 while (true)
-                {
+                {//thread for each client
                     Console.WriteLine("Waiting for client connections.");
                     TcpClient client = listener.AcceptTcpClient();
                     Console.WriteLine("Accepted new client connection.");
@@ -61,14 +66,16 @@ namespace ServerSide
             {
                 Console.WriteLine("SocketException: {0}", e);
             }
-            finally
-            {
-                if (listener != null)
-                {
-                    listener.Stop();
-                }
-            }
         }
+
+
+
+
+
+
+
+
+
         public void NotifyClientMessage()
         {
             //take in message from client and store it in queue 
@@ -83,16 +90,4 @@ namespace ServerSide
 
         }
     }
-    //StreamReader reader = new StreamReader(client.GetStream());
-    //StreamWriter writer = new StreamWriter(client.GetStream());
-    //string emptyString = string.Empty;
-    //while (!(emptyString = reader.ReadLine()).Equals("Exit") || (emptyString == null))
-    //{
-    //    Console.WriteLine("From client" + emptyString);
-    //    writer.WriteLine("From server" + emptyString);
-    //    writer.Flush();
-    //}
-    //reader.Close();
-    //writer.Close();
-    //client.Close();
 }

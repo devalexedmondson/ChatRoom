@@ -22,7 +22,7 @@ namespace TCPChatRoom
         {
             try
             {
-                 client = new TcpClient("192.168.0.130", 8080);
+                 client = new TcpClient("127.0.0.1", 8080);
             }
             catch (SocketException e)
             {
@@ -35,7 +35,7 @@ namespace TCPChatRoom
             SendCommunication();
         }
         public void SendCommunication()
-        {
+        {//thread for sending
             while (true)
             {
                 byte[] data = Encoding.ASCII.GetBytes(Console.ReadLine());
@@ -46,7 +46,7 @@ namespace TCPChatRoom
             }
         }
         public void RecieveCommunication()
-        {
+        {//thread for recieving 
             data = new byte[256];
 
             string responseData = string.Empty;
