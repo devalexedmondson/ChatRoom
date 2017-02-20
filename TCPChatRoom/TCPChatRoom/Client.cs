@@ -5,7 +5,7 @@ using System.Text;
 using System.Net;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace TCPChatRoom
 {
@@ -32,7 +32,9 @@ namespace TCPChatRoom
             {
                 Console.WriteLine("ArgumentNullException: {0}", e);
             }
-            SendCommunication();
+            Thread newThread = new Thread(SendCommunication);
+            newThread.Start();
+            //SendCommunication();
         }
         public void SendCommunication()
         {//thread for sending
@@ -42,7 +44,8 @@ namespace TCPChatRoom
                  stream =  client.GetStream();
 
                 stream.Write(data, 0, data.Length);
-                RecieveCommunication();
+                Thread newThread = new Thread(RecieveCommunication);
+                newThread.Start();
             }
         }
         public void RecieveCommunication()
@@ -55,7 +58,5 @@ namespace TCPChatRoom
             responseData = Encoding.ASCII.GetString(data, 0, bytes);
             Console.WriteLine("Received: {0}", responseData);
         }
-        //stream.Close();
-        //client.Close();
     }
 }

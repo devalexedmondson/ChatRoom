@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -15,10 +16,12 @@ namespace ServerSide
         TcpListener listener;
         private string data;
         private byte[] bytes;
+        Queue myQ;
         
         public Server()
         {
             room = new List<Room>();
+            myQ = new Queue();
         }
         public void StartServer()
         {
@@ -37,11 +40,12 @@ namespace ServerSide
             {
                 Console.WriteLine("SocketException: {0}", e);
             }
-            RecieveClients();
+            Thread newThread = new Thread(RecieveClients);
+            newThread.Start();
+            //RecieveClients();
         }
        public void RecieveClients()
        {
-
             while (true)
                 {//thread for each client
                     Console.WriteLine("Waiting for client connections.");
@@ -55,17 +59,18 @@ namespace ServerSide
                     while (i != 0)
                     {
                         data = Encoding.ASCII.GetString(bytes, 0, i);
+                        myQ.Enqueue(data);
                         Console.WriteLine("From User: {0}", data);
-                      // if i want to alter data--> data = data;
+                      // if i want to alter data--> data = data.toUpper().trim();
                         byte[] msg = Encoding.ASCII.GetBytes(data);
-
-
+                    
                         stream.Write(msg, 0, msg.Length);
                         Console.WriteLine("Sent: {0}", data);
 
+                        myQ.Dequeue();
                         i = stream.Read(bytes, 0, bytes.Length);
                     }
-                    //client.Close();
+                    client.Close();
                     Console.WriteLine("Closing connection with client");
                 }
             }
