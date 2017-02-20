@@ -8,29 +8,46 @@ using System.Text;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Threading;
+using Server;
 
 namespace ServerSide
 {
-    public class Server
+    public class Server: IObservable<TcpClient>
     {
         List<Room> room;
+        Unsubscriber unsubscribe;
         TcpListener listener;
         TcpClient client;
+        List<IObserver<TcpClient>> observers;
         private string data;
         private byte[] bytes;
         Queue myQ;
         
         public Server()
         {
+            client = new TcpClient();
+            observers = new List<IObserver<TcpClient>>();
             room = new List<Room>();
             myQ = new Queue();
+        }
+        public IDisposable Subscribe(IObserver<TcpClient> observer)
+        {//subscribe adds observers
+             if (!observers.Contains(observer))
+            {
+                observers.Add(observer);
+            }
+             foreach(TcpClient item in observers)
+            {
+                observer.OnNext(item);
+            }
+            return new Unsubscriber(observers, observer);
         }
         public void StartServer()
         {
             listener = null;
             try
             {
-                listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8080);
+                listener = new TcpListener(IPAddress.Any, 8080);
                 listener.Start();
                 Console.WriteLine("MultiThread Started");
 

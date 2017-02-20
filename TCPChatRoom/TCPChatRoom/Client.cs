@@ -9,14 +9,18 @@ using System.Threading;
 
 namespace TCPChatRoom
 {
-    public class Client 
+    public class Client : IObserver<TcpClient>
     {
+        private IDisposable unsubscriber;
         private TcpClient client;
         private NetworkStream stream;
         private byte[] data;
         public Client()
         {
-          
+        }
+        public void Subscribe(IObservable<TcpClient> server)
+        {
+            unsubscriber = server.Subscribe(this);
         }
         public void CreateClient(string message, string ipAddress, int portNumber)
         {
